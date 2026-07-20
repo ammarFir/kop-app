@@ -1,80 +1,89 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Data Anggota') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-
-                    @if (Auth::user()->role == 'fo' || Auth::user()->role == 'super_admin')
-                        <a href="{{ route('anggota.create') }}"
-                            class="bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded mb-4 inline-block">
-                            + Tambah Anggota
-                        </a>
-                    @endif
-
-                    @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                            {{ session('success') }}
+@extends('layouts.app')
+@section('title', 'Data Anggota')
+@section('content')
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Data Anggota</h3>
+                        <div>
+                            <a href="{{ route('anggota.create') }}" class="btn btn-primary btn-sm">
+                                + Tambah Anggota
+                            </a>
+                            <a href="{{ route('anggota.export') }}" class="btn btn-success btn-sm">
+                                📥 Export Excel
+                            </a>
                         </div>
-                    @endif
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full border-collapse">
-                            <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="border p-2 text-left">No</th>
-                                    <th class="border p-2 text-left">No Anggota</th>
-                                    <th class="border p-2 text-left">Nama</th>
-                                    <th class="border p-2 text-left">Email</th>
-                                    <th class="border p-2 text-left">NIK</th>
-                                    <th class="border p-2 text-left">Alamat</th>
-                                    <th class="border p-2 text-left">No Telepon</th>
-                                    <th class="border p-2 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($anggotaList as $key => $anggota)
-                                    <tr>
-                                        <td class="border p-2">{{ $key + 1 }}</td>
-                                        <td class="border p-2">{{ $anggota->no_anggota ?? '-' }}</td>
-                                        <td class="border p-2">{{ $anggota->name }}</td>
-                                        <td class="border p-2">{{ $anggota->email }}</td>
-                                        <td class="border p-2">{{ $anggota->nik ?? '-' }}</td>
-                                        <td class="border p-2">{{ $anggota->alamat ?? '-' }}</td>
-                                        <td class="border p-2">{{ $anggota->no_telepon ?? '-' }}</td>
-                                        <td class="border p-2 text-center">
-                                            @if (Auth::user()->role == 'fo' || Auth::user()->role == 'super_admin')
-                                                <a href="{{ route('anggota.edit', $anggota->id) }}"
-                                                    class="text-blue-600 hover:underline">Edit</a>
-                                                <form action="{{ route('anggota.destroy', $anggota->id) }}"
-                                                    method="POST" class="inline-block"
-                                                    onsubmit="return confirm('Yakin hapus data ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                        class="text-red-600 hover:underline ml-2">Hapus</button>
-                                                </form>
-                                            @else
-                                                <span class="text-gray-400">Tidak ada aksi</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="border p-2 text-center">Belum ada data anggota</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
                     </div>
+                    <div class="card-body">
+                        @if (session('success'))
+                            <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
 
+                        <!-- Form Pencarian -->
+                        <form method="GET" action="{{ route('anggota.index') }}" class="mb-3">
+                            <div class="input-group">
+                                <input type="text" name="search" placeholder="Cari nama, email, no anggota, NIK..."
+                                    value="{{ request('search') }}" class="form-control">
+                                <button type="submit" class="btn btn-primary">Cari</button>
+                                @if (request('search'))
+                                    <a href="{{ route('anggota.index') }}" class="btn btn-secondary">Reset</a>
+                                @endif
+                            </div>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>No Anggota</th>
+                                        <th>Nama</th>
+                                        <th>Email</th>
+                                        <th>NIK</th>
+                                        <th>Alamat</th>
+                                        <th>No Telepon</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($anggotaList as $key => $anggota)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $anggota->no_anggota ?? '-' }}</td>
+                                            <td>{{ $anggota->name }}</td>
+                                            <td>{{ $anggota->email }}</td>
+                                            <td>{{ $anggota->nik ?? '-' }}</td>
+                                            <td>{{ $anggota->alamat ?? '-' }}</td>
+                                            <td>{{ $anggota->no_telepon ?? '-' }}</td>
+                                            <td>
+                                                <a href="{{ route('anggota.edit', $anggota->id) }}"
+                                                    class="btn btn-warning btn-sm">Edit</a>
+                                                <form action="{{ route('anggota.destroy', $anggota->id) }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="return confirm('Yakin?')">Hapus</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center">Belum ada data anggota</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="mt-3">
+                            {{ $anggotaList->onEachSide(1)->links('pagination::bootstrap-5') }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

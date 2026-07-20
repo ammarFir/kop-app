@@ -1,91 +1,63 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
+<h4 class="mb-3">Profile Information</h4>
+<p class="text-muted">Update your account's profile information.</p>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
-    </header>
+<form method="post" action="{{ route('profile.update') }}">
+    @csrf
+    @method('patch')
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror"
+            value="{{ old('name', $user->name) }}" required>
+        @error('name')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
-        @csrf
-        @method('patch')
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror"
+            value="{{ old('email', $user->email) }}" required>
+        @error('email')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
 
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)"
-                required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+    @if (Auth::user()->role == 'anggota')
+        <hr>
+        <h5 class="mt-3">Data Anggota</h5>
+
+        <div class="mb-3">
+            <label for="no_anggota" class="form-label">No Anggota</label>
+            <input type="text" name="no_anggota" id="no_anggota" class="form-control" value="{{ $user->no_anggota }}"
+                disabled readonly>
         </div>
 
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)"
-                required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
-
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification"
-                            class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
-                </div>
-            @endif
+        <div class="mb-3">
+            <label for="nik" class="form-label">NIK</label>
+            <input type="text" name="nik" id="nik" class="form-control" value="{{ $user->nik }}"
+                disabled readonly>
         </div>
 
-        <!-- FIELD KHUSUS ANGGOTA -->
-        @if (Auth::user()->role == 'anggota')
-            <div>
-                <x-input-label for="no_anggota" :value="__('No Anggota')" />
-                <x-text-input id="no_anggota" name="no_anggota" type="text" class="mt-1 block w-full"
-                    :value="old('no_anggota', $user->no_anggota)" disabled readonly />
-            </div>
-
-            <div>
-                <x-input-label for="nik" :value="__('NIK')" />
-                <x-text-input id="nik" name="nik" type="text" class="mt-1 block w-full" :value="old('nik', $user->nik)"
-                    disabled readonly />
-            </div>
-
-            <div>
-                <x-input-label for="alamat" :value="__('Alamat')" />
-                <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full"
-                    :value="old('alamat', $user->alamat)" />
-                <x-input-error class="mt-2" :messages="$errors->get('alamat')" />
-            </div>
-
-            <div>
-                <x-input-label for="no_telepon" :value="__('No Telepon')" />
-                <x-text-input id="no_telepon" name="no_telepon" type="text" class="mt-1 block w-full"
-                    :value="old('no_telepon', $user->no_telepon)" />
-                <x-input-error class="mt-2" :messages="$errors->get('no_telepon')" />
-            </div>
-        @endif
-
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600">{{ __('Saved.') }}</p>
-            @endif
+        <div class="mb-3">
+            <label for="alamat" class="form-label">Alamat</label>
+            <input type="text" name="alamat" id="alamat"
+                class="form-control @error('alamat') is-invalid @enderror" value="{{ old('alamat', $user->alamat) }}">
+            @error('alamat')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
-    </form>
-</section>
+
+        <div class="mb-3">
+            <label for="no_telepon" class="form-label">No Telepon</label>
+            <input type="text" name="no_telepon" id="no_telepon"
+                class="form-control @error('no_telepon') is-invalid @enderror"
+                value="{{ old('no_telepon', $user->no_telepon) }}">
+            @error('no_telepon')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    @endif
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>

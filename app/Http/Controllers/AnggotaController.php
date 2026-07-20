@@ -9,10 +9,20 @@ use Illuminate\Support\Facades\Hash;
 class AnggotaController extends Controller
 {
     // Tampilkan daftar anggota (khusus FO & Super Admin)
-    public function index()
+    public function index(Request $request)
     {
-        $anggotaList = User::where('role', 'anggota')->get();
-        return view('anggota.index', compact('anggotaList'));
+        $search = $request->input('search');
+
+        $anggotaList = User::where('role', 'anggota')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('no_anggota', 'like', '%' . $search . '%')
+                    ->orWhere('nik', 'like', '%' . $search . '%');
+            })
+            ->paginate(2);
+
+        return view('anggota.index', compact('anggotaList', 'search'));
     }
 
     // Tampilkan form tambah anggota (khusus FO)
@@ -99,5 +109,11 @@ class AnggotaController extends Controller
         $anggota->delete();
 
         return redirect()->route('anggota.index')->with('success', 'Anggota berhasil dihapus!');
+    }
+
+    // Export data anggota ke Excel
+    public function export()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\AnggotaExport, 'data-anggota.xlsx');
     }
 }

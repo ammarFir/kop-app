@@ -37,6 +37,21 @@ Route::middleware(['auth', 'role:fo,super_admin'])->prefix('anggota')->name('ang
     Route::get('/{id}/edit', [App\Http\Controllers\AnggotaController::class, 'edit'])->name('edit');
     Route::put('/{id}', [App\Http\Controllers\AnggotaController::class, 'update'])->name('update');
     Route::delete('/{id}', [App\Http\Controllers\AnggotaController::class, 'destroy'])->name('destroy');
+    Route::get('/export', [App\Http\Controllers\AnggotaController::class, 'export'])->name('export');
 });
+
+// ROUTE DEBUG DASHBOARD
+Route::get('/debug-dashboard', function () {
+    $user = \Illuminate\Support\Facades\Auth::user();
+    $totalFO = \App\Models\User::where('role', 'fo')->count();
+    $totalAnggota = \App\Models\User::where('role', 'anggota')->count();
+
+    return response()->json([
+        'user' => $user->name ?? 'NULL',
+        'role' => $user->role ?? 'NULL',
+        'totalFO' => $totalFO,
+        'totalAnggota' => $totalAnggota,
+    ]);
+})->middleware('auth');
 
 require __DIR__ . '/auth.php';

@@ -13,10 +13,21 @@ class DashboardController extends Controller
         $user = Auth::user();
         $role = $user->role;
 
-        // Data untuk dashboard
         $totalFO = User::where('role', 'fo')->count();
         $totalAnggota = User::where('role', 'anggota')->count();
 
-        return view('dashboard', compact('user', 'role', 'totalFO', 'totalAnggota'));
+        // Debug: tampilkan semua data di view
+        return view('dashboard', [
+            'user' => $user,
+            'role' => $role,
+            'totalFO' => $totalFO,
+            'totalAnggota' => $totalAnggota,
+            'debug' => [
+                'totalFO' => $totalFO,
+                'totalAnggota' => $totalAnggota,
+                'role' => $role,
+                'user_name' => $user->name,
+            ]
+        ]);
     }
 }
