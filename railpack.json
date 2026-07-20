@@ -14,9 +14,13 @@
     "libjpeg-dev",
     "libfreetype6-dev",
     "libssl-dev",
-    "libgd-dev"
+    "libgd-dev",
+    "libpq-dev"
   ],
   "packages": {
     "php": "8.3"
+  },
+  "deploy": {
+    "aptPackages": ["libpq5"]
   }
 }
