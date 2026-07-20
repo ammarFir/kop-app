@@ -13,7 +13,8 @@
     "libpng-dev",
     "libjpeg-dev",
     "libfreetype6-dev",
-    "libssl-dev"
+    "libssl-dev",
+    "libgd-dev"
   ],
   "packages": {
     "php": "8.3"
