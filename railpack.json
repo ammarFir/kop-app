@@ -1,5 +1,8 @@
 {
   "packages": {
     "php": "8.3"
+  },
+  "php": {
+    "extensions": ["gd", "pdo_mysql", "mbstring", "curl", "openssl", "tokenizer", "xml", "json"]
   }
 }
